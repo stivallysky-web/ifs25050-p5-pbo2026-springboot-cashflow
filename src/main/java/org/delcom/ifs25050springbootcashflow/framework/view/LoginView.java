@@ -35,10 +35,12 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         H2 title = new H2("Masuk ke Cashflow");
 
         EmailField emailField = new EmailField("Email");
+        emailField.setId("login-username");
         emailField.setWidth("320px");
         emailField.setRequiredIndicatorVisible(true);
 
         PasswordField passwordField = new PasswordField("Password");
+        passwordField.setId("login-password");
         passwordField.setWidth("320px");
         passwordField.setRequiredIndicatorVisible(true);
 
@@ -55,6 +57,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                 notif.addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         });
+        loginBtn.setId("login-submit");
         loginBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         loginBtn.setWidth("320px");
 
