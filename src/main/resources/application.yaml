@@ -1,10 +1,15 @@
+server:
+  port: ${PORT:8080}
+
 spring:
   application:
     name: ifs25050-p5-pbo2026-springboot-cashflow
+  config:
+    import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:postgresql://localhost:5432/pbo2026_cashflow
-    username: postgres
-    password: postgres
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/pbo2026_cashflow}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
 vaadin:
@@ -12,4 +17,8 @@ vaadin:
 
 app:
   upload:
-    dir: uploads
+    dir: ${UPLOAD_DIR:uploads}
+  admin:
+    name: ${ROOT_ADMIN_NAME:Administrator}
+    email: ${ROOT_ADMIN_EMAIL:admin@delcom.org}
+    password: ${ROOT_ADMIN_PASSWORD:admin123}
