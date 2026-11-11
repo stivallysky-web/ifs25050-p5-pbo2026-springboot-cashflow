@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: ifs25050-p5-pbo2026-springboot-cashflow
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pbo2026_cashflow
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+vaadin:
+  launch-browser: false
+
+app:
+  upload:
+    dir: uploads
