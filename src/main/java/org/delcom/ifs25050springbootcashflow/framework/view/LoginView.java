@@ -47,8 +47,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         emailField.setValueChangeMode(ValueChangeMode.EAGER);
         emailField.getElement().setAttribute("name", "username");
         emailField.getElement().setAttribute("autocomplete", "username");
-        emailField.getElement().synchronizeProperty("value", "change");
-        emailField.getElement().synchronizeProperty("value", "blur");
         styleNativeInput(emailField);
 
         NativeLabel emailLabel = new NativeLabel("Email");
@@ -62,8 +60,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         passwordField.setValueChangeMode(ValueChangeMode.EAGER);
         passwordField.getElement().setAttribute("name", "password");
         passwordField.getElement().setAttribute("autocomplete", "current-password");
-        passwordField.getElement().synchronizeProperty("value", "change");
-        passwordField.getElement().synchronizeProperty("value", "blur");
         styleNativeInput(passwordField);
 
         NativeLabel passwordLabel = new NativeLabel("Password");
