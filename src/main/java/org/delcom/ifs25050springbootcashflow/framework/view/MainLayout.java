@@ -35,7 +35,11 @@ public class MainLayout extends AppLayout {
         Span userSpan = new Span();
         authSession.getCurrentUser().ifPresent(u -> userSpan.setText(u.getName() + " (" + u.getRole() + ")"));
 
-        HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo, userSpan, logoutBtn);
+        // [PERUBAHAN] Menambahkan aria-label pada tombol DrawerToggle untuk kepatuhan Axe Core
+        DrawerToggle toggle = new DrawerToggle();
+        toggle.setAriaLabel("Menu Navigasi");
+
+        HorizontalLayout header = new HorizontalLayout(toggle, logo, userSpan, logoutBtn);
         header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         header.expand(logo);
         header.setWidthFull();

@@ -11,7 +11,6 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
 import org.delcom.ifs25050springbootcashflow.adapter.storage.FileStorage;
 import org.delcom.ifs25050springbootcashflow.domain.entity.Transaction;
-import org.delcom.ifs25050springbootcashflow.domain.entity.TransactionType;
 import org.delcom.ifs25050springbootcashflow.domain.entity.User;
 import org.delcom.ifs25050springbootcashflow.framework.auth.AuthSession;
 import org.delcom.ifs25050springbootcashflow.framework.component.FinancePresenter;
@@ -49,7 +48,8 @@ public class UserTransactionReadOnlyView extends VerticalLayout implements Befor
         Button backBtn = new Button("Kembali ke Kelola Pengguna", e ->
                 getUI().ifPresent(ui -> ui.navigate(UserManagementView.class)));
 
-        balanceInfo.getStyle().set("font-weight", "bold").set("color", "#1a73e8").set("font-size", "1.2em");
+        // [PERUBAHAN 1] Menggunakan warna biru tua #0d47a1 untuk kontras maksimal
+        balanceInfo.getStyle().set("font-weight", "bold").set("color", "#0d47a1").set("font-size", "1.2em");
 
         grid.setSizeFull();
 
@@ -57,14 +57,15 @@ public class UserTransactionReadOnlyView extends VerticalLayout implements Befor
             if (t.getAttachmentPath() != null && !t.getAttachmentPath().isBlank()) {
                 StreamResource resource = new StreamResource(t.getAttachmentPath(),
                         () -> new ByteArrayInputStream(fileStorage.loadAsBytes(t.getAttachmentPath())));
-                Image img = new Image(resource, "Bukti");
+                Image img = new Image(resource, "Bukti " + t.getTitle());
                 img.setWidth("45px");
                 img.setHeight("45px");
                 img.getStyle().set("object-fit", "cover").set("cursor", "pointer").set("border-radius", "4px");
                 img.addClickListener(e -> new ImageZoomDialog(img.getSrc(), t.getTitle()).open());
                 return img;
             }
-            return new Image();
+            // [PERUBAHAN 2] Mengganti Image() kosong menjadi Span("-") agar tidak melanggar aturan image-alt
+            return new Span("-");
         }).setHeader("Bukti").setWidth("75px").setFlexGrow(0);
 
         grid.addColumn(Transaction::getTitle).setHeader("Judul Transaksi");

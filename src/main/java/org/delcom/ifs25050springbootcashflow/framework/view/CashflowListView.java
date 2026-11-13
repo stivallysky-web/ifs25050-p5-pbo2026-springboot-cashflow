@@ -65,19 +65,22 @@ public class CashflowListView extends VerticalLayout implements BeforeEnterObser
         // 3 Kartu Ringkasan Saldo
         HorizontalLayout summaryCards = createSummaryCards();
 
-        // Toolbar Filter dan Search
+        // [PERUBAHAN 1] Menambahkan setAriaLabel pada semua input filter agar lolos Axe Core (label)
         searchField.setPlaceholder("Cari transaksi...");
+        searchField.setAriaLabel("Cari transaksi");
         searchField.setWidth("250px");
         searchField.setClearButtonVisible(true);
         searchField.addValueChangeListener(e -> refreshData());
 
         typeFilter.setPlaceholder("Semua Tipe");
+        typeFilter.setAriaLabel("Filter tipe transaksi");
         typeFilter.setItems(TransactionType.values());
         typeFilter.setItemLabelGenerator(TransactionType::getLabel);
         typeFilter.setClearButtonVisible(true);
         typeFilter.setWidth("180px");
         typeFilter.addValueChangeListener(e -> refreshData());
 
+        sortBox.setAriaLabel("Urutkan transaksi");
         sortBox.setItems(SortOption.values());
         sortBox.setItemLabelGenerator(SortOption::getLabel);
         sortBox.setValue(SortOption.NEWEST);
@@ -105,9 +108,10 @@ public class CashflowListView extends VerticalLayout implements BeforeEnterObser
         expenseCard.getStyle().set("background-color", "#fce8e6").set("border-radius", "8px").set("padding", "15px");
         totalExpenseSpan.getStyle().set("font-size", "1.4em").set("font-weight", "bold").set("color", "#c5221f");
 
+        // [PERUBAHAN 2] Menggunakan warna biru tua #0d47a1 agar kontras warna di atas #e8f0fe lolos Axe Core
         VerticalLayout balanceCard = new VerticalLayout(new Span("Saldo Bersih"), netBalanceSpan);
         balanceCard.getStyle().set("background-color", "#e8f0fe").set("border-radius", "8px").set("padding", "15px");
-        netBalanceSpan.getStyle().set("font-size", "1.4em").set("font-weight", "bold").set("color", "#1a73e8");
+        netBalanceSpan.getStyle().set("font-size", "1.4em").set("font-weight", "bold").set("color", "#0d47a1");
 
         HorizontalLayout cards = new HorizontalLayout(incomeCard, expenseCard, balanceCard);
         cards.setWidthFull();
@@ -122,14 +126,15 @@ public class CashflowListView extends VerticalLayout implements BeforeEnterObser
             if (t.getAttachmentPath() != null && !t.getAttachmentPath().isBlank()) {
                 StreamResource resource = new StreamResource(t.getAttachmentPath(),
                         () -> new ByteArrayInputStream(fileStorage.loadAsBytes(t.getAttachmentPath())));
-                Image img = new Image(resource, "Bukti");
+                Image img = new Image(resource, "Bukti " + t.getTitle());
                 img.setWidth("45px");
                 img.setHeight("45px");
                 img.getStyle().set("object-fit", "cover").set("cursor", "pointer").set("border-radius", "4px");
                 img.addClickListener(e -> new ImageZoomDialog(img.getSrc(), t.getTitle()).open());
                 return img;
             }
-            return new Image();
+            // [PERUBAHAN 3] Mengembalikan Span("-") alih-alih Image() kosong tanpa atribut alt
+            return new Span("-");
         }).setHeader("Bukti").setWidth("75px").setFlexGrow(0);
 
         grid.addColumn(Transaction::getTitle).setHeader("Judul Transaksi").setSortable(true);

@@ -2,13 +2,14 @@ package org.delcom.ifs25050springbootcashflow.framework.view;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Input;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
-import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
@@ -28,21 +29,40 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         this.authUseCase = authUseCase;
         this.authSession = authSession;
 
+        // Landmark utama agar lolos audit aksesibilitas Axe Core (0 violations)
+        getElement().setAttribute("role", "main");
+
         setSizeFull();
         setAlignItems(FlexComponent.Alignment.CENTER);
         setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 
-        H2 title = new H2("Masuk ke Cashflow");
+        H1 title = new H1("Masuk ke Cashflow");
 
-        EmailField emailField = new EmailField("Email");
+        Input emailField = new Input();
         emailField.setId("login-username");
+        emailField.setType("email");
+        emailField.setPlaceholder("Email");
         emailField.setWidth("320px");
-        emailField.setRequiredIndicatorVisible(true);
+        emailField.setValueChangeMode(ValueChangeMode.EAGER);
+        emailField.getElement().setAttribute("name", "username");
+        emailField.getElement().setAttribute("autocomplete", "username");
+        styleNativeInput(emailField);
 
-        PasswordField passwordField = new PasswordField("Password");
+        NativeLabel emailLabel = new NativeLabel("Email");
+        emailLabel.setFor(emailField);
+
+        Input passwordField = new Input();
         passwordField.setId("login-password");
+        passwordField.setType("password");
+        passwordField.setPlaceholder("Password");
         passwordField.setWidth("320px");
-        passwordField.setRequiredIndicatorVisible(true);
+        passwordField.setValueChangeMode(ValueChangeMode.EAGER);
+        passwordField.getElement().setAttribute("name", "password");
+        passwordField.getElement().setAttribute("autocomplete", "current-password");
+        styleNativeInput(passwordField);
+
+        NativeLabel passwordLabel = new NativeLabel("Password");
+        passwordLabel.setFor(passwordField);
 
         Button loginBtn = new Button("Masuk", e -> {
             String email = emailField.getValue();
@@ -51,9 +71,13 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
             var userOpt = authUseCase.login(email, password);
             if (userOpt.isPresent()) {
                 authSession.login(userOpt.get());
-                getUI().ifPresent(ui -> ui.navigate(CashflowListView.class));
+                getUI().ifPresent(ui -> ui.getPage().setLocation("/"));
             } else {
-                Notification notif = Notification.show("Email atau password salah!", 3000, Notification.Position.TOP_CENTER);
+                Notification notif = Notification.show(
+                        "Email atau password salah!",
+                        3000,
+                        Notification.Position.TOP_CENTER
+                );
                 notif.addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         });
@@ -63,7 +87,17 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
         RouterLink registerLink = new RouterLink("Belum punya akun? Daftar di sini", RegisterView.class);
 
-        add(title, emailField, passwordField, loginBtn, registerLink);
+        add(title, emailLabel, emailField, passwordLabel, passwordField, loginBtn, registerLink);
+    }
+
+    private static void styleNativeInput(Input input) {
+        input.getStyle()
+                .set("padding", "0.5rem 0.75rem")
+                .set("border", "1px solid var(--lumo-contrast-30pct, #c5c5c5)")
+                .set("border-radius", "var(--lumo-border-radius-m, 4px)")
+                .set("font-size", "1rem")
+                .set("font-family", "inherit")
+                .set("box-sizing", "border-box");
     }
 
     @Override
