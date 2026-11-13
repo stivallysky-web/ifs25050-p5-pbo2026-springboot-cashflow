@@ -30,17 +30,15 @@ public class RegisterView extends VerticalLayout implements BeforeEnterObserver 
         this.authUseCase = authUseCase;
         this.authSession = authSession;
 
-        // [PERUBAHAN 1] Menambahkan role="main" untuk mencegah Axe violation (landmark-one-main & region)
+        // Landmark utama agar lolos audit Axe Core
         getElement().setAttribute("role", "main");
 
         setSizeFull();
         setAlignItems(FlexComponent.Alignment.CENTER);
         setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 
-        // [PERUBAHAN 2] Mengubah H2 menjadi H1 untuk mencegah Axe violation (page-has-heading-one)
         H1 title = new H1("Pendaftaran Akun Baru");
 
-        // [PERUBAHAN 3] Menggunakan Input & NativeLabel dengan pasangan id-for yang eksplisit
         Input nameField = new Input();
         nameField.setId("register-name");
         nameField.setType("text");

@@ -57,15 +57,16 @@ public class CashflowListView extends VerticalLayout implements BeforeEnterObser
         this.authSession = authSession;
         this.fileStorage = fileStorage;
 
+        // Landmark utama agar lolos audit Axe Core
+        getElement().setAttribute("role", "main");
+
         setSizeFull();
         setPadding(true);
 
         H2 header = new H2("Ringkasan & Catatan Keuangan Saya");
 
-        // 3 Kartu Ringkasan Saldo
         HorizontalLayout summaryCards = createSummaryCards();
 
-        // [PERUBAHAN 1] Menambahkan setAriaLabel pada semua input filter agar lolos Axe Core (label)
         searchField.setPlaceholder("Cari transaksi...");
         searchField.setAriaLabel("Cari transaksi");
         searchField.setWidth("250px");
@@ -108,7 +109,6 @@ public class CashflowListView extends VerticalLayout implements BeforeEnterObser
         expenseCard.getStyle().set("background-color", "#fce8e6").set("border-radius", "8px").set("padding", "15px");
         totalExpenseSpan.getStyle().set("font-size", "1.4em").set("font-weight", "bold").set("color", "#c5221f");
 
-        // [PERUBAHAN 2] Menggunakan warna biru tua #0d47a1 agar kontras warna di atas #e8f0fe lolos Axe Core
         VerticalLayout balanceCard = new VerticalLayout(new Span("Saldo Bersih"), netBalanceSpan);
         balanceCard.getStyle().set("background-color", "#e8f0fe").set("border-radius", "8px").set("padding", "15px");
         netBalanceSpan.getStyle().set("font-size", "1.4em").set("font-weight", "bold").set("color", "#0d47a1");
@@ -133,7 +133,6 @@ public class CashflowListView extends VerticalLayout implements BeforeEnterObser
                 img.addClickListener(e -> new ImageZoomDialog(img.getSrc(), t.getTitle()).open());
                 return img;
             }
-            // [PERUBAHAN 3] Mengembalikan Span("-") alih-alih Image() kosong tanpa atribut alt
             return new Span("-");
         }).setHeader("Bukti").setWidth("75px").setFlexGrow(0);
 
@@ -181,12 +180,10 @@ public class CashflowListView extends VerticalLayout implements BeforeEnterObser
         if (!authSession.isLoggedIn()) return;
         Long userId = authSession.getCurrentUser().get().getId();
 
-        // Update Saldo
         totalIncomeSpan.setText(FinancePresenter.formatRupiah(transactionUseCase.getTotalIncome(userId)));
         totalExpenseSpan.setText(FinancePresenter.formatRupiah(transactionUseCase.getTotalExpense(userId)));
         netBalanceSpan.setText(FinancePresenter.formatRupiah(transactionUseCase.getBalance(userId)));
 
-        // Update Tabel
         List<Transaction> list = transactionUseCase.search(userId, searchField.getValue(), typeFilter.getValue(), sortBox.getValue());
         grid.setItems(list);
     }

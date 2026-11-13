@@ -35,7 +35,6 @@ public class MainLayout extends AppLayout {
         Span userSpan = new Span();
         authSession.getCurrentUser().ifPresent(u -> userSpan.setText(u.getName() + " (" + u.getRole() + ")"));
 
-        // [PERUBAHAN] Menambahkan aria-label pada tombol DrawerToggle untuk kepatuhan Axe Core
         DrawerToggle toggle = new DrawerToggle();
         toggle.setAriaLabel("Menu Navigasi");
 
@@ -44,6 +43,9 @@ public class MainLayout extends AppLayout {
         header.expand(logo);
         header.setWidthFull();
         header.addClassNames("py-0", "px-m");
+
+        // Menandai header sebagai banner landmark agar lolos audit Axe Core
+        header.getElement().setAttribute("role", "banner");
 
         addToNavbar(header);
     }
@@ -56,6 +58,10 @@ public class MainLayout extends AppLayout {
         if (authSession.isAdmin()) {
             nav.add(new RouterLink("Kelola Pengguna (Admin)", UserManagementView.class));
         }
+
+        // Menandai drawer sebagai navigation landmark
+        nav.getElement().setAttribute("role", "navigation");
+        nav.getElement().setAttribute("aria-label", "Menu Utama Aplikasi");
 
         addToDrawer(nav);
     }

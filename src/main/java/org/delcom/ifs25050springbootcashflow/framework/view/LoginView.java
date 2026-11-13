@@ -1,9 +1,10 @@
 package org.delcom.ifs25050springbootcashflow.framework.view;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.Shortcuts;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Input;
+import com.vaadin.flow.component.html.NativeButton;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -29,7 +30,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         this.authUseCase = authUseCase;
         this.authSession = authSession;
 
-        // Landmark utama agar lolos audit aksesibilitas Axe Core (0 violations)
+        // Landmark utama agar lolos audit Axe Core (landmark-one-main & region)
         getElement().setAttribute("role", "main");
 
         setSizeFull();
@@ -46,6 +47,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         emailField.setValueChangeMode(ValueChangeMode.EAGER);
         emailField.getElement().setAttribute("name", "username");
         emailField.getElement().setAttribute("autocomplete", "username");
+        emailField.getElement().synchronizeProperty("value", "change");
+        emailField.getElement().synchronizeProperty("value", "blur");
         styleNativeInput(emailField);
 
         NativeLabel emailLabel = new NativeLabel("Email");
@@ -59,12 +62,14 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         passwordField.setValueChangeMode(ValueChangeMode.EAGER);
         passwordField.getElement().setAttribute("name", "password");
         passwordField.getElement().setAttribute("autocomplete", "current-password");
+        passwordField.getElement().synchronizeProperty("value", "change");
+        passwordField.getElement().synchronizeProperty("value", "blur");
         styleNativeInput(passwordField);
 
         NativeLabel passwordLabel = new NativeLabel("Password");
         passwordLabel.setFor(passwordField);
 
-        Button loginBtn = new Button("Masuk", e -> {
+        Runnable performLogin = () -> {
             String email = emailField.getValue();
             String password = passwordField.getValue();
 
@@ -80,10 +85,23 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                 );
                 notif.addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
-        });
+        };
+
+        NativeButton loginBtn = new NativeButton("Masuk", e -> performLogin.run());
         loginBtn.setId("login-submit");
-        loginBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        loginBtn.setWidth("320px");
+        loginBtn.getElement().setAttribute("type", "submit");
+        loginBtn.getStyle()
+                .set("width", "320px")
+                .set("padding", "0.6rem 0.75rem")
+                .set("background-color", "#0d47a1")
+                .set("color", "#ffffff")
+                .set("border", "none")
+                .set("border-radius", "4px")
+                .set("font-size", "1rem")
+                .set("font-weight", "600")
+                .set("cursor", "pointer");
+
+        Shortcuts.addShortcutListener(this, performLogin::run, Key.ENTER);
 
         RouterLink registerLink = new RouterLink("Belum punya akun? Daftar di sini", RegisterView.class);
 
