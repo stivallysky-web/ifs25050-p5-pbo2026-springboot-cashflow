@@ -20,6 +20,17 @@ public class MainLayout extends AppLayout {
         this.authSession = authSession;
         createHeader();
         createDrawer();
+
+        getElement().executeJs(
+                "setTimeout(() => {" +
+                        "  document.querySelectorAll('vaadin-connection-indicator').forEach(el => {" +
+                        "    if (!el.getAttribute('role')) {" +
+                        "      el.setAttribute('role', 'region');" +
+                        "      el.setAttribute('aria-label', 'Status Koneksi Aplikasi');" +
+                        "    }" +
+                        "  });" +
+                        "}, 300);"
+        );
     }
 
     private void createHeader() {

@@ -34,7 +34,7 @@ public class UserManagementView extends VerticalLayout implements BeforeEnterObs
         this.fileStorage = fileStorage;
 
         getElement().setAttribute("role", "main");
-        
+
         setSizeFull();
         setPadding(true);
 
