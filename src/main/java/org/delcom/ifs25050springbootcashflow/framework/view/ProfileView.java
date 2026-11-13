@@ -41,6 +41,8 @@ public class ProfileView extends VerticalLayout implements BeforeEnterObserver {
         this.authSession = authSession;
         this.fileStorage = fileStorage;
 
+        getElement().setAttribute("role", "main");
+
         setSizeFull();
         setPadding(true);
         setAlignItems(FlexComponent.Alignment.CENTER);
