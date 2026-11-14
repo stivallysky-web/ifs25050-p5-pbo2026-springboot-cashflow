@@ -30,10 +30,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         this.authUseCase = authUseCase;
         this.authSession = authSession;
 
-        // Landmark utama agar lolos audit Axe Core
         getElement().setAttribute("role", "main");
 
-        // [PERBAIKAN FINAL] Menambahkan Meta Description dan MutationObserver untuk indikator koneksi
         String js = "if (!document.querySelector('meta[name=\"description\"]')) {" +
                 "  var meta = document.createElement('meta');" +
                 "  meta.name = 'description';" +
@@ -90,7 +88,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
             var userOpt = authUseCase.login(email, password);
             if (userOpt.isPresent()) {
                 authSession.login(userOpt.get());
-                getUI().ifPresent(ui -> ui.getPage().setLocation("/"));
+                // [PERBAIKAN] Menggunakan UI Navigate agar AuthSession tidak hilang (SPA Routing)
+                getUI().ifPresent(ui -> ui.navigate(CashflowListView.class));
             } else {
                 Notification notif = Notification.show(
                         "Email atau password salah!",
@@ -103,7 +102,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
         NativeButton loginBtn = new NativeButton("Masuk", e -> performLogin.run());
         loginBtn.setId("login-submit");
-        loginBtn.getElement().setAttribute("type", "submit");
+        // Atribut type="submit" dihapus agar tidak terjadi reload native pada browser
         loginBtn.getStyle()
                 .set("width", "320px")
                 .set("padding", "0.6rem 0.75rem")
