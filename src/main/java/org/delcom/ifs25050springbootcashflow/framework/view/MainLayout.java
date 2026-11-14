@@ -18,19 +18,27 @@ public class MainLayout extends AppLayout {
 
     public MainLayout(AuthSession authSession) {
         this.authSession = authSession;
+
+        // [PERBAIKAN FINAL] Menambahkan Meta Description dan MutationObserver untuk halaman terproteksi
+        String js = "if (!document.querySelector('meta[name=\"description\"]')) {" +
+                "  var meta = document.createElement('meta');" +
+                "  meta.name = 'description';" +
+                "  meta.content = 'Aplikasi pencatatan keuangan Cashflow terintegrasi.';" +
+                "  document.head.appendChild(meta);" +
+                "}" +
+                "const observer = new MutationObserver(function() {" +
+                "  document.querySelectorAll('vaadin-connection-indicator').forEach(function(el) {" +
+                "    if (!el.hasAttribute('role')) {" +
+                "      el.setAttribute('role', 'region');" +
+                "      el.setAttribute('aria-label', 'Status Koneksi Aplikasi');" +
+                "    }" +
+                "  });" +
+                "});" +
+                "observer.observe(document.body, {childList: true, subtree: true});";
+        getElement().executeJs(js);
+
         createHeader();
         createDrawer();
-
-        getElement().executeJs(
-                "setTimeout(() => {" +
-                        "  document.querySelectorAll('vaadin-connection-indicator').forEach(el => {" +
-                        "    if (!el.getAttribute('role')) {" +
-                        "      el.setAttribute('role', 'region');" +
-                        "      el.setAttribute('aria-label', 'Status Koneksi Aplikasi');" +
-                        "    }" +
-                        "  });" +
-                        "}, 300);"
-        );
     }
 
     private void createHeader() {
@@ -55,7 +63,6 @@ public class MainLayout extends AppLayout {
         header.setWidthFull();
         header.addClassNames("py-0", "px-m");
 
-        // Menandai header sebagai banner landmark agar lolos audit Axe Core
         header.getElement().setAttribute("role", "banner");
 
         addToNavbar(header);
@@ -70,7 +77,6 @@ public class MainLayout extends AppLayout {
             nav.add(new RouterLink("Kelola Pengguna (Admin)", UserManagementView.class));
         }
 
-        // Menandai drawer sebagai navigation landmark
         nav.getElement().setAttribute("role", "navigation");
         nav.getElement().setAttribute("aria-label", "Menu Utama Aplikasi");
 

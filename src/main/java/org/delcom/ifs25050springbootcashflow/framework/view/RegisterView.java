@@ -30,8 +30,25 @@ public class RegisterView extends VerticalLayout implements BeforeEnterObserver 
         this.authUseCase = authUseCase;
         this.authSession = authSession;
 
-        // Landmark utama agar lolos audit Axe Core
         getElement().setAttribute("role", "main");
+
+        // [PERBAIKAN FINAL] Menambahkan Meta Description dan MutationObserver untuk indikator koneksi
+        String js = "if (!document.querySelector('meta[name=\"description\"]')) {" +
+                "  var meta = document.createElement('meta');" +
+                "  meta.name = 'description';" +
+                "  meta.content = 'Aplikasi pencatatan keuangan Cashflow terintegrasi.';" +
+                "  document.head.appendChild(meta);" +
+                "}" +
+                "const observer = new MutationObserver(function() {" +
+                "  document.querySelectorAll('vaadin-connection-indicator').forEach(function(el) {" +
+                "    if (!el.hasAttribute('role')) {" +
+                "      el.setAttribute('role', 'region');" +
+                "      el.setAttribute('aria-label', 'Status Koneksi Registrasi');" +
+                "    }" +
+                "  });" +
+                "});" +
+                "observer.observe(document.body, {childList: true, subtree: true});";
+        getElement().executeJs(js);
 
         setSizeFull();
         setAlignItems(FlexComponent.Alignment.CENTER);

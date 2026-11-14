@@ -1,4 +1,3 @@
-
 package org.delcom.ifs25050springbootcashflow.framework.view;
 
 import com.vaadin.flow.component.Key;
@@ -17,7 +16,6 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
-
 import org.delcom.ifs25050springbootcashflow.framework.auth.AuthSession;
 import org.delcom.ifs25050springbootcashflow.usecase.AuthUseCase;
 
@@ -32,19 +30,26 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         this.authUseCase = authUseCase;
         this.authSession = authSession;
 
-        // Landmark utama agar lolos audit Axe Core (landmark-one-main & region)
+        // Landmark utama agar lolos audit Axe Core
         getElement().setAttribute("role", "main");
 
-        getElement().executeJs(
-                "setTimeout(() => {" +
-                        "  document.querySelectorAll('vaadin-connection-indicator').forEach(el => {" +
-                        "    if (!el.getAttribute('role')) {" +
-                        "      el.setAttribute('role', 'region');" +
-                        "      el.setAttribute('aria-label', 'Status Koneksi Login');" +
-                        "    }" +
-                        "  });" +
-                        "}, 300);"
-        );
+        // [PERBAIKAN FINAL] Menambahkan Meta Description dan MutationObserver untuk indikator koneksi
+        String js = "if (!document.querySelector('meta[name=\"description\"]')) {" +
+                "  var meta = document.createElement('meta');" +
+                "  meta.name = 'description';" +
+                "  meta.content = 'Aplikasi pencatatan keuangan Cashflow terintegrasi.';" +
+                "  document.head.appendChild(meta);" +
+                "}" +
+                "const observer = new MutationObserver(function() {" +
+                "  document.querySelectorAll('vaadin-connection-indicator').forEach(function(el) {" +
+                "    if (!el.hasAttribute('role')) {" +
+                "      el.setAttribute('role', 'region');" +
+                "      el.setAttribute('aria-label', 'Status Koneksi Login');" +
+                "    }" +
+                "  });" +
+                "});" +
+                "observer.observe(document.body, {childList: true, subtree: true});";
+        getElement().executeJs(js);
 
         setSizeFull();
         setAlignItems(FlexComponent.Alignment.CENTER);
@@ -83,7 +88,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
             String password = passwordField.getValue();
 
             var userOpt = authUseCase.login(email, password);
-
             if (userOpt.isPresent()) {
                 authSession.login(userOpt.get());
                 getUI().ifPresent(ui -> ui.getPage().setLocation("/"));
@@ -93,19 +97,13 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                         3000,
                         Notification.Position.TOP_CENTER
                 );
-
                 notif.addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         };
 
-        NativeButton loginBtn = new NativeButton(
-                "Masuk",
-                e -> performLogin.run()
-        );
-
+        NativeButton loginBtn = new NativeButton("Masuk", e -> performLogin.run());
         loginBtn.setId("login-submit");
         loginBtn.getElement().setAttribute("type", "submit");
-
         loginBtn.getStyle()
                 .set("width", "320px")
                 .set("padding", "0.6rem 0.75rem")
@@ -119,20 +117,9 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
         Shortcuts.addShortcutListener(this, performLogin::run, Key.ENTER);
 
-        RouterLink registerLink = new RouterLink(
-                "Belum punya akun? Daftar di sini",
-                RegisterView.class
-        );
+        RouterLink registerLink = new RouterLink("Belum punya akun? Daftar di sini", RegisterView.class);
 
-        add(
-                title,
-                emailLabel,
-                emailField,
-                passwordLabel,
-                passwordField,
-                loginBtn,
-                registerLink
-        );
+        add(title, emailLabel, emailField, passwordLabel, passwordField, loginBtn, registerLink);
     }
 
     private static void styleNativeInput(Input input) {
