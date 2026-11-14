@@ -32,22 +32,23 @@ public class RegisterView extends VerticalLayout implements BeforeEnterObserver 
 
         getElement().setAttribute("role", "main");
 
-        // [PERBAIKAN FINAL] Menambahkan Meta Description dan MutationObserver untuk indikator koneksi
         String js = "if (!document.querySelector('meta[name=\"description\"]')) {" +
                 "  var meta = document.createElement('meta');" +
                 "  meta.name = 'description';" +
                 "  meta.content = 'Aplikasi pencatatan keuangan Cashflow terintegrasi.';" +
                 "  document.head.appendChild(meta);" +
                 "}" +
-                "const observer = new MutationObserver(function() {" +
+                "function fixIndicator() {" +
                 "  document.querySelectorAll('vaadin-connection-indicator').forEach(function(el) {" +
-                "    if (!el.hasAttribute('role')) {" +
-                "      el.setAttribute('role', 'region');" +
-                "      el.setAttribute('aria-label', 'Status Koneksi Registrasi');" +
-                "    }" +
+                "    el.setAttribute('role', 'region');" +
+                "    el.setAttribute('aria-label', 'Status Koneksi');" +
+                "    el.setAttribute('aria-hidden', 'true');" +
+                "    el.style.display = 'none';" +
                 "  });" +
-                "});" +
-                "observer.observe(document.body, {childList: true, subtree: true});";
+                "}" +
+                "fixIndicator();" +
+                "const observer = new MutationObserver(fixIndicator);" +
+                "observer.observe(document.documentElement, {childList: true, subtree: true});";
         getElement().executeJs(js);
 
         setSizeFull();
@@ -101,7 +102,6 @@ public class RegisterView extends VerticalLayout implements BeforeEnterObserver 
             }
         });
         registerBtn.setId("register-submit");
-        registerBtn.getElement().setAttribute("type", "submit");
         registerBtn.getStyle()
                 .set("width", "320px")
                 .set("padding", "0.6rem 0.75rem")

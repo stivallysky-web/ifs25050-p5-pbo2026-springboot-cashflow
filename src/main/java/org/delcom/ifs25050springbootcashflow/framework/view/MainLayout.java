@@ -19,22 +19,23 @@ public class MainLayout extends AppLayout {
     public MainLayout(AuthSession authSession) {
         this.authSession = authSession;
 
-        // [PERBAIKAN FINAL] Menambahkan Meta Description dan MutationObserver untuk halaman terproteksi
         String js = "if (!document.querySelector('meta[name=\"description\"]')) {" +
                 "  var meta = document.createElement('meta');" +
                 "  meta.name = 'description';" +
                 "  meta.content = 'Aplikasi pencatatan keuangan Cashflow terintegrasi.';" +
                 "  document.head.appendChild(meta);" +
                 "}" +
-                "const observer = new MutationObserver(function() {" +
+                "function fixIndicator() {" +
                 "  document.querySelectorAll('vaadin-connection-indicator').forEach(function(el) {" +
-                "    if (!el.hasAttribute('role')) {" +
-                "      el.setAttribute('role', 'region');" +
-                "      el.setAttribute('aria-label', 'Status Koneksi Aplikasi');" +
-                "    }" +
+                "    el.setAttribute('role', 'region');" +
+                "    el.setAttribute('aria-label', 'Status Koneksi');" +
+                "    el.setAttribute('aria-hidden', 'true');" +
+                "    el.style.display = 'none';" +
                 "  });" +
-                "});" +
-                "observer.observe(document.body, {childList: true, subtree: true});";
+                "}" +
+                "fixIndicator();" +
+                "const observer = new MutationObserver(fixIndicator);" +
+                "observer.observe(document.documentElement, {childList: true, subtree: true});";
         getElement().executeJs(js);
 
         createHeader();

@@ -38,15 +38,17 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                 "  meta.content = 'Aplikasi pencatatan keuangan Cashflow terintegrasi.';" +
                 "  document.head.appendChild(meta);" +
                 "}" +
-                "const observer = new MutationObserver(function() {" +
+                "function fixIndicator() {" +
                 "  document.querySelectorAll('vaadin-connection-indicator').forEach(function(el) {" +
-                "    if (!el.hasAttribute('role')) {" +
-                "      el.setAttribute('role', 'region');" +
-                "      el.setAttribute('aria-label', 'Status Koneksi Login');" +
-                "    }" +
+                "    el.setAttribute('role', 'region');" +
+                "    el.setAttribute('aria-label', 'Status Koneksi');" +
+                "    el.setAttribute('aria-hidden', 'true');" +
+                "    el.style.display = 'none';" +
                 "  });" +
-                "});" +
-                "observer.observe(document.body, {childList: true, subtree: true});";
+                "}" +
+                "fixIndicator();" +
+                "const observer = new MutationObserver(fixIndicator);" +
+                "observer.observe(document.documentElement, {childList: true, subtree: true});";
         getElement().executeJs(js);
 
         setSizeFull();
@@ -88,7 +90,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
             var userOpt = authUseCase.login(email, password);
             if (userOpt.isPresent()) {
                 authSession.login(userOpt.get());
-                // [PERBAIKAN] Menggunakan UI Navigate agar AuthSession tidak hilang (SPA Routing)
                 getUI().ifPresent(ui -> ui.navigate(CashflowListView.class));
             } else {
                 Notification notif = Notification.show(
@@ -102,7 +103,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
         NativeButton loginBtn = new NativeButton("Masuk", e -> performLogin.run());
         loginBtn.setId("login-submit");
-        // Atribut type="submit" dihapus agar tidak terjadi reload native pada browser
         loginBtn.getStyle()
                 .set("width", "320px")
                 .set("padding", "0.6rem 0.75rem")
